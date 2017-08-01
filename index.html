@@ -87,7 +87,7 @@
           render() {
             return (
               <div style={this.state.styles} onMouseOver={this.overHandler}>
-                  <p style={{margin :0, color: `rgb(${Math.random()*200}, 0, ${Math.random()*50})`}}>{this.state.message}</p>
+                  <h4 style={{ margin :0, color: `rgb(${Math.random()*300}, 0, ${Math.random()*200})`}}>{this.state.message}</h4>
                 {this.state.time.toLocaleTimeString()}
               </div>
             );
