@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>Simple-js</title>
+   </head>
+   <body>
+    <div id="root"></div>
+    <script type="text/javascript">
+    const container = document.getElementById("root");
+
+    const grandParent = document.createElement("div");
+    grandParent.style.display = 'flex';
+    grandParent.style.flexDirection = 'column';
+    grandParent.style.justifyContent = 'center';
+    grandParent.style.alignItems = 'center';
+    grandParent.style.border = '2px solid rgb(200, 0, 58)';
+    grandParent.style.margin = "10px";
+    grandParent.style.padding = "10px";
+    grandParent.style.position = "absolute";
+    grandParent.style.overflow = 'hidden';
+    grandParent.style.top = "0";
+    grandParent.style.bottom = "0";
+    grandParent.style.right = "0";
+    grandParent.style.left = "0";
+
+    const grand_button = document.createElement("button");
+    grandParent.appendChild(grand_button);
+    grand_button.innerHTML = "grandParent"
+
+    const parent1 = document.createElement("div");
+    parent1.style.display = 'flex';
+    parent1.style.justifyContent = 'center';
+    parent1.style.alignItems = 'center';
+    parent1.style.border = '2px solid rgb(304, 0, 108)';
+    parent1.style.margin = "10px";
+    parent1.style.padding = "10px";
+
+    const parent1_button = document.createElement("button");
+    parent1.appendChild(parent1_button);
+    parent1_button.innerHTML = "parent1 removable";
+
+    parent1_button.onclick = () => {
+      console.log("clicked parent1")
+      grandParent.removeChild(parent1);
+    }
+
+    const parent2 = document.createElement("div");
+    parent2.style.display = 'flex';
+    parent2.style.justifyContent = 'center';
+    parent2.style.alignItems = 'center';
+    parent2.style.flexDirection = 'column';
+    parent2.style.overflow = 'hidden';
+    parent2.style.border = '2px solid rgb(104, 0, 108)';
+    parent2.style.margin = "10px";
+    parent2.style.padding = "10px";
+
+    const parent2_remove = document.createElement("button");
+    parent2.appendChild(parent2_remove);
+    parent2_remove.innerHTML = "parent2 removable"
+
+    const parent2_children = document.createElement("button");
+    parent2.appendChild(parent2_children);
+    parent2_children.innerHTML = " show children";
+
+    parent2_remove.onclick = () => {
+      console.log("clicked parent2 remove");
+      grandParent.removeChild(parent2);
+    }
+
+    grand_button.onclick = () => {
+      console.log("clicked")
+      if(grandParent.childElementCount <= 3){
+        grandParent.appendChild(parent1);
+        grandParent.appendChild(parent2);
+      }
+      else{
+        grandParent.removeChild(parent1);
+        grandParent.removeChild(parent2);
+      }
+    }
+
+    const parent2_child1 = document.createElement("div");
+    parent2_child1.style.border = '2px solid rgb(204, 0, 108)';
+    parent2_child1.style.margin = "5px";
+    parent2_child1.style.padding = "5px";
+
+    const parent2_child1_button = document.createElement("button");
+    parent2_child1.appendChild(parent2_child1_button);
+    parent2_child1_button.innerHTML = "parent2_child1 removable"
+
+    parent2_child1_button.onclick = () => {
+      console.log("clicked parent2 child 1")
+      parent2.removeChild(parent2_child1);
+      parent2_children.innerHTML = " show children";
+    }
+
+    const parent2_child2 = document.createElement("div");
+    parent2_child2.style.border = '2px solid rgb(204, 0, 108)';
+    parent2_child2.style.margin = "5px";
+    parent2_child2.style.padding = "5px";
+
+    const parent2_child2_button = document.createElement("button");
+    parent2_child2.appendChild(parent2_child2_button);
+    parent2_child2_button.innerHTML = "parent2_child2 removable";
+
+    parent2_child2_button.onclick = () => {
+      console.log("clicked parent2 child2")
+      parent2.removeChild(parent2_child2);
+      parent2_children.innerHTML = " show children";
+    }
+
+    parent2_children.onclick = () => {
+      console.log("clicked parent2")
+      if(parent2.childElementCount <= 3){
+        parent2.appendChild(parent2_child1);
+        parent2.appendChild(parent2_child2);
+        parent2_children.innerHTML= "remove children";
+      }
+      else{
+        parent2.removeChild(parent2_child1);
+        parent2.removeChild(parent2_child2);
+        parent2_children.innerHTML= "show children";
+      }
+    }
+
+    container.appendChild(grandParent);
+    </script>
+  </body>
+</html>
