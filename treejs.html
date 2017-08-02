@@ -8,7 +8,25 @@
     <div id='root'></div>
     <script type='text/javascript'>
 
-    const createNode = (name , i) => {
+    closeHandler = (myNode, button, tagName, elements_duplicate) => {
+      let elements = myNode.getElementsByTagName(tagName);
+      if(elements.length !== 0){
+        button.innerHTML = 'OPEN';
+        while (elements[0]) {
+          elements_duplicate.push(elements[0]);
+          myNode.removeChild(elements[0])
+        }
+        return;
+      }
+      if(elements.length === 0){
+        button.innerHTML = 'CLOSE';
+        let i = 0;
+        while (elements_duplicate[i]) myNode.appendChild(elements_duplicate[i++]);
+        return;
+      }
+    }
+
+    const createNode = (name) => {
       const node = document.createElement('div');
       node.style.display = 'flex';
       node.style.flexDirection = 'column';
@@ -26,19 +44,13 @@
       const node_add = document.createElement('button');
       node_add.innerHTML = 'ADD';
       node_add.style.margin = '10px';
-
-      node_add.onclick = () => {
-        let child = createNode(`${name}${i}`, ++i);
-        node.appendChild(child);
-      }
+      let i = 0;
+      node_add.onclick = () => node.appendChild(createNode(`${name}${i++}`));
 
       const node_remove = document.createElement('button');
       node_remove.innerHTML = 'REMOVE';
       node_remove.style.margin = '10px';
-
-      node_remove.onclick = () => {
-        node.remove();
-      }
+      node_remove.onclick = () => node.remove();
 
       const node_close = document.createElement('button');
       node_close.innerHTML = 'CLOSE';
@@ -58,63 +70,25 @@
       content.style.flexFlow = 'row wrap';
 
       let elements_copy = [];
-
-      node_close.onclick = () => {
-        let elements = node.getElementsByTagName('div');
-        if(elements.length !== 0){
-          node_close.innerHTML = 'OPEN';
-          while (elements[0]) {
-            elements_copy.push(elements[0]);
-            node.removeChild(elements[0])
-          }
-          return;
-        }
-        if(elements.length === 0){
-          node_close.innerHTML = 'CLOSE';
-          let i = 0;
-          while (elements_copy[i]) node.appendChild(elements_copy[i++]);
-          return;
-        }
-      }
+      node_close.addEventListener('click', () => closeHandler(node, node_close, 'div', elements_copy));
 
       node.appendChild(content);
       return node;
     }
-
+///////////////////////////////////////////////////////
     const container = document.getElementById('root');
     const container_name = document.createElement('h3');
     container_name.innerHTML = 'ROOT';
 
     const container_add = document.createElement('button');
     container_add.innerHTML = 'ADD';
-
     let i = 0;
-    container_add.onclick = () => {
-      container.appendChild(createNode(`Ghild${i++}`, i));
-    }
+    container_add.onclick = () => container.appendChild(createNode(`Ghild${i++}`));
 
     const container_close = document.createElement('button');
     container_close.innerHTML = 'CLOSE';
-
     let elements_clone = [];
-
-    container_close.onclick = () => {
-      let elements = container.getElementsByTagName('div');
-      if(elements.length !== 0){
-        container_close.innerHTML = 'OPEN';
-        while (elements[0]) {
-          elements_clone.push(elements[0]);
-          container.removeChild(elements[0])
-        }
-        return;
-      }
-      if(elements.length === 0){
-        container_close.innerHTML = 'CLOSE';
-        let i = 0;
-        while (elements_clone[i]) container.appendChild(elements_clone[i++]);
-        return;
-      }
-    }
+    container_close.addEventListener('click', () => closeHandler(container, container_close, 'div', elements_clone));
 
     container.appendChild(container_name);
     container.appendChild(container_add);
