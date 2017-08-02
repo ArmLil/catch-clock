@@ -2,7 +2,7 @@
 <html lang='en'>
    <head>
       <meta charset='UTF-8'>
-      <title>Tree-js</title>
+      <title>hands-js</title>
    </head>
    <body>
     <div id='root'></div>
@@ -18,7 +18,7 @@
       node.style.margin = '10px';
       node.style.padding = '10px';
       node.style.overflow = 'hidden';
-      //node.style.borderRadius = '50%';
+      node.style.borderRadius = '50%';
 
       const node_name = document.createElement('h3');
       node_name.innerHTML = name;
@@ -40,6 +40,24 @@
         node.remove();
       }
 
+      const node_hands = document.createElement('button');
+      node_hands.innerHTML = 'hands';
+      node_hands.style.margin = '10px';
+
+      node_hands.onclick = () => {
+        let hand = createNode(`${name}h${i}`, ++i);
+        hand.style.display = 'flex';
+        hand.style.flexDirection = 'row';
+        hand.style.justifyContent = 'center';
+        hand.style.alignItems = 'center';
+        hand.style.border = `2px solid rgb(${parseInt(Math.random()*300)}, 0, ${parseInt(Math.random()*200)})`;
+        hand.style.margin = '10px';
+        hand.style.padding = '10px';
+        hand.style.overflow = 'hidden';
+        hand.style.borderRadius = '50%';
+        container.appendChild(hand);
+      }
+
       const node_close = document.createElement('button');
       node_close.innerHTML = 'CLOSE';
       node_close.style.margin = '10px';
@@ -49,6 +67,7 @@
       content.appendChild(node_add);
       content.appendChild(node_remove);
       content.appendChild(node_close);
+      content.appendChild(node_hands);
       content.style.display = 'flex';
       content.style.justifyContent = 'center';
       content.style.alignItems = 'center';
@@ -120,8 +139,8 @@
     container.appendChild(container_add);
     container.appendChild(container_close);
     container.style.display = 'flex';
-    container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
+    //container.style.padding = '10px';
 
     </script>
   </body>
