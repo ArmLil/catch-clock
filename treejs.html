@@ -8,25 +8,21 @@
     <div id='root'></div>
     <script type='text/javascript'>
 
-    closeHandler = (myNode, button, tagName, elements_duplicate) => {
+    closeHandler = (myNode, button, tagName ) => {
       let elements = myNode.getElementsByTagName(tagName);
-      if(elements.length !== 0){
+      if(elements.length !== 0 & button.innerHTML =='CLOSE'){
         button.innerHTML = 'OPEN';
-        while (elements[0]) {
-          elements_duplicate.push(elements[0]);
-          myNode.removeChild(elements[0])
-        }
+        for(e of elements) e.style.visibility = 'hidden';
         return;
       }
-      if(elements.length === 0){
+      if(elements.length !== 0 & button.innerHTML =='OPEN') {
         button.innerHTML = 'CLOSE';
-        let i = 0;
-        while (elements_duplicate[i]) myNode.appendChild(elements_duplicate[i++]);
+        for(e of elements) e.style.visibility = 'visible';
         return;
       }
     }
-
-    const createNode = (name) => {
+////////////////////////////////////////////////////////////
+    createNode = (name) => {
       const node = document.createElement('div');
       node.style.display = 'flex';
       node.style.flexDirection = 'column';
@@ -36,7 +32,6 @@
       node.style.margin = '10px';
       node.style.padding = '10px';
       node.style.overflow = 'hidden';
-      //node.style.borderRadius = '50%';
 
       const node_name = document.createElement('h3');
       node_name.innerHTML = name;
@@ -69,9 +64,8 @@
       content.style.overflow = 'hidden';
       content.style.flexFlow = 'row wrap';
 
-      let elements_copy = [];
-      node_close.addEventListener('click', () => closeHandler(node, node_close, 'div', elements_copy));
-
+      node_close.addEventListener('click', () => closeHandler(node, node_close, 'div'));
+      //node_close.onclick = () => closeHandler(node, node_close, 'div');
       node.appendChild(content);
       return node;
     }
@@ -87,9 +81,8 @@
 
     const container_close = document.createElement('button');
     container_close.innerHTML = 'CLOSE';
-    let elements_clone = [];
-    container_close.addEventListener('click', () => closeHandler(container, container_close, 'div', elements_clone));
-
+    container_close.addEventListener('click', () => closeHandler(container, container_close, 'div'));
+    //container_close.onclick = () => closeHandler(container, container_close, 'div');
     container.appendChild(container_name);
     container.appendChild(container_add);
     container.appendChild(container_close);
