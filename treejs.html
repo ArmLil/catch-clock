@@ -7,36 +7,35 @@
    <body>
     <div id='root'></div>
     <script type='text/javascript'>
-    closeHandler = (myNode, button, tagName ) => {
-      console.log(button.parentNode.nextSibling)
-      let elements = myNode.getElementsByTagName(tagName);
-      const ul = button.parentNode.nextSibling;
-      if(elements.length !== 0 & button.innerHTML =='CLOSE'){
-        button.innerHTML = 'OPEN';
-        // for(e of elements) e.style.visibility = 'hidden';
-        ul.style.visibility = 'hidden';
+    closeHandler = (close_button ) => {
+      const ul = close_button.parentNode.nextSibling;
+      if(close_button.innerHTML =='CLOSE'){
+        close_button.innerHTML = 'OPEN';
+        ul.style.display = 'none';
         return;
       }
-      if(elements.length !== 0 & button.innerHTML =='OPEN') {
-        button.innerHTML = 'CLOSE';
-        // for(e of elements) e.style.visibility = 'visible';
-        ul.style.visibility = 'visible';
+      if(close_button.innerHTML =='OPEN') {
+        close_button.innerHTML = 'CLOSE';
+        ul.style.display = 'block';
         return;
       }
     }
-    createAddButton = (button_close, li, name) => {
-      const container_add = document.createElement('button');
-      const container_ul = document.createElement('ul');
-      container_add.innerHTML = 'ADD';
-      let i = 0;
-      container_add.onclick = () => {
-        if(button_close.disabled) {
-          li.appendChild(container_ul);
-          button_close.disabled = false;
+    addHandler = (add_button, i, ul) => {
+      const close_button = add_button.nextSibling;
+      const _name = add_button.previousSibling.innerHTML;
+      const li = close_button.parentNode.parentNode;
+        if(close_button.disabled) {
+          li.appendChild(ul);
+          close_button.disabled = false;
         }
-        container_ul.appendChild(createNode(`${name}${i++}`, button_close));
+        ul.appendChild(createNode(`${_name}${i++}`, close_button));
       }
-      return container_add;
+    removeHandler = (remove_button, parent_close_button) => {
+      const node_li = remove_button.parentNode.parentNode;
+      const parent = node_li.parentNode;
+      const siblings = parent.getElementsByTagName('li');
+      if(siblings.length == '1') parent_close_button.disabled = true;
+      node_li.remove();
     }
     createRoot = (name) => {
       const root_li = document.createElement('li');
@@ -45,39 +44,34 @@
       const root_name = document.createElement('h3');
       root_name.innerHTML = name;
       root_div.appendChild(root_name);
-      const root_close = document.createElement('button');
-      root_close.innerHTML = 'CLOSE';
-      root_close.disabled = true;
-      root_close.addEventListener('click', () => closeHandler(root_li, root_close, 'ul'));
-      //root_close.onclick = () => closeHandler(root_li, root_close, 'div');
-      const root_add = createAddButton(root_close, root_li, name);
-      root_div.appendChild(root_add);
-      root_div.appendChild(root_close);
+      const root_close_button = document.createElement('button');
+      root_close_button.innerHTML = 'CLOSE';
+      root_close_button.disabled = true;
+      root_close_button.addEventListener('click', () => closeHandler(root_close_button));
+      const root_add_button = document.createElement('button');
+      root_add_button.innerHTML = 'ADD';
+      const root_ul = document.createElement('ul');
+      let i = 0;
+      root_add_button.addEventListener('click', () => addHandler(root_add_button, i++, root_ul));
+      root_div.appendChild(root_add_button);
+      root_div.appendChild(root_close_button);
       return [root_li,root_div];
     }
     createNode = (name, close_button) => {
       const node = createRoot(name);
       const node_li = node[0];
       const node_div = node[1];
-      const node_remove = document.createElement('button');
-      node_remove.innerHTML = 'REMOVE';
-      node_remove.onclick = () => {
-        const parent = node_li.parentNode;
-        const siblings = parent.getElementsByTagName('li');
-        console.log(siblings.length);
-        if(siblings.length == '1') close_button.disabled = true;
-        node_li.remove();
-      }
-      node_div.appendChild(node_remove);
+      const node_remove_button = document.createElement('button');
+      node_remove_button.innerHTML = 'REMOVE';
+      node_remove_button.addEventListener('click',() => removeHandler(node_remove_button, close_button));
+      node_div.appendChild(node_remove_button);
       return node_li;
     }
     const container = document.getElementById('root');
     const container_ul = document.createElement('ul');
     const container_li = createRoot('Tree')[0];
-
     container_ul.appendChild(container_li);
     container.appendChild(container_ul);
-
     </script>
   </body>
 </html>
