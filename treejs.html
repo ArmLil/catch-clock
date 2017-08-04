@@ -72,8 +72,12 @@
       return node_li;
     }
     const container = document.getElementById('root');
+    const container_ul = document.createElement('ul');
     const container_li = createRoot('Tree')[0];
-    container.appendChild(container_li);
+
+    container_ul.appendChild(container_li);
+    container.appendChild(container_ul);
+
     </script>
   </body>
 </html>
