@@ -59,8 +59,8 @@
     }
     checkButtonsState = () => {
       const inputArr = document.querySelectorAll('input:checked');
-      const close_button = document.querySelector('button[value = "CLOSE"]');;
-      const remove_button = document.querySelector('button[value = "REMOVE"]');;
+      const close_button = document.querySelector('button[value = "CLOSE"]');
+      const remove_button = document.querySelector('button[value = "REMOVE"]');
       if(!inputArr.length) {
         close_button.disabled = true;
         remove_button.disabled = true;
@@ -125,6 +125,8 @@
           grandParent.remove();
         else grandParent.parentNode.remove();
       }
+      const close_button = document.querySelector('button[value = "CLOSE"]');
+      close_button.innerHTML = 'CLOSE';
       checkButtonsState();
     }
     createHeader = () => {
