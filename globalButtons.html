@@ -39,10 +39,16 @@
     createBranch = (name) => {
       const li = document.createElement('li');
       const div = document.createElement('div');
-      div.innerHTML = ('|___')
+      div.id = `d${name}`;
+      const li_name = document.createElement('h3');
+      li_name.innerHTML = name;
+      div.appendChild(li_name);
       const input = createInput(name);
-      li.innerHTML = name;
-      li.appendChild(input);
+      input.style.cssFloat = 'left';
+      div.appendChild(input);
+      const p = document.createElement('p');
+      p.innerHTML = ('|___');
+      div.appendChild(p);
       li.appendChild(div);
       return li;
     }
@@ -60,11 +66,13 @@
         remove_button.disabled = true;
       } else {
         remove_button.disabled = false;
-        for(inp of inputArr)
-          if(!inp.nextSibling.nextSibling){
+        for(inp of inputArr){
+        let grandParent = inp.parentNode.parentNode;
+          if(grandParent.childElementCount < 2){
             close_button.disabled = true;
             break;
           } else close_button.disabled = false;
+        }
       }
     }
     addHandler = () => {
@@ -76,16 +84,16 @@
         parent.parentNode.appendChild(createUl(rootName));
       } else if(input_arr.length) {
           for(inp of input_arr) {
-            if(!inp.nextSibling.nextSibling){
-              inp.parentNode.appendChild(createUl(inp.id));
+            if(!inp.parentNode.nextSibling){
+              inp.parentNode.parentNode.appendChild(createUl(inp.id));
             } else {
-              let subUl = inp.parentNode.lastChild;
-              const inputId = subUl.lastChild.firstChild.nextSibling.id;
+              let subUl = inp.parentNode.nextSibling;
+              const inputId = subUl.lastChild.querySelector('INPUT').id;
               subUl.appendChild(createBranch(getName(inputId)));
             }
           }
       } else {
-        const inputId = ul.lastChild.firstChild.nextSibling.id;
+        const inputId = ul.lastChild.querySelector('INPUT').id;
         ul.appendChild(createBranch(getName(inputId)));
       }
       checkButtonsState();
@@ -96,15 +104,15 @@
       if(close_button.innerHTML =='CLOSE'){
         close_button.innerHTML = 'OPEN';
         for (inp of input_arr){
-          let ul = inp.nextSibling.nextSibling;
-          inp.nextSibling.style.display = 'none';
+          let ul = inp.parentNode.nextSibling;
+          inp.nextSibling.style.visibility = 'hidden';
           ul.style.display = 'none';
         }
       } else {
         close_button.innerHTML = 'CLOSE';
         for (inp of input_arr){
-          let ul = inp.nextSibling.nextSibling;
-          inp.nextSibling.style.display = 'block';
+          let ul = inp.parentNode.nextSibling;
+          inp.nextSibling.style.visibility = 'visible';
           ul.style.display = 'block';
         }
       }
@@ -112,8 +120,10 @@
     removeHandler = () => {
       const input_arr = document.querySelectorAll('input:checked');
       for(inp of input_arr) {
-        if (inp.parentNode.nextSibling) inp.parentNode.remove();
-        else inp.parentNode.parentNode.remove();
+        let grandParent = inp.parentNode.parentNode;
+        if(grandParent.parentNode.childElementCount > 1)
+          grandParent.remove();
+        else grandParent.parentNode.remove();
       }
       checkButtonsState();
     }
