@@ -257,7 +257,8 @@
     }
 
     dropHandler = (ev) => {
-      let parent = ev.target;
+      console.log('dropping');
+      const parent = ev.target;
       const ul_arr = [];
       let children = parent.childNodes;
       const index = getNearElIndex(ev);
@@ -268,16 +269,19 @@
         if(children[i] !== el)
         ul_arr.push(children[i]);
       }
+      if(!el.nextSibling && !el.previousSibling
+        && (el.parentNode.parentNode.parentNode.tagName === 'UL')
+        && (parent !== el.parentNode))
+        el.parentNode.remove();
       ul_arr.splice(index,0,el);
       while(parent.firstChild) parent.firstChild.remove();
-      for(let i = 0; i < n; ++i){
+      i = 0;
+      while(ul_arr[i]) {
         console.log(ul_arr[i].firstChild.firstChild.innerHTML);
         //ul_arr[i].firstChild.firstChild.innerHTML += ` -> ${i}`;
-        parent.appendChild(ul_arr[i]);
+        parent.appendChild(ul_arr[i++]);
       }
-      // for(let i = 0; i < n; ++i){
-      //   console.log(ul_arr[i].title);
-      // }
+
       parent.style.backgroundColor = 'initial';
       input3.setAttribute("value",`${showCoords(ev)}, target=${ev.target.id}, data=${data}`);
       ev.preventDefault();
