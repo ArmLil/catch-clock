@@ -24,6 +24,7 @@
     createRemoveButoon = () => {
       return createButton('REMOVE', () => removeHandler());
     }
+    grandParent = (el) => {return el.parentNode.parentNode}
     getName = (name) => {
       const nameRoot = name.slice(0,name.length-1);
       let i = name[name.length-1];
@@ -42,17 +43,21 @@
       const li = document.createElement('li');
       li.id = `li${id}`;
       li.title = name;
+      li.value = 0;
       const div = document.createElement('div');
       div.id = `div${id}`;
-      const li_name = document.createElement('h3');
+      div.value = 1;
+      const li_name = document.createElement('h2');
       li_name.innerHTML = name;
       div.appendChild(li_name);
       const input = createInput(id);
       input.style.cssFloat = 'left';
       div.appendChild(input);
-      const p = document.createElement('p');
-      p.innerHTML = (`|___ id = ${li.id}`);
-      div.appendChild(p);
+      const address = document.createElement('h2');
+      address.innerHTML = (`|___ id = ${li.id}`);
+      address.value = 3;
+      address.style.color = `rgb(${parseInt(Math.random()*300)}, 0, ${parseInt(Math.random()*200)})`;
+      div.appendChild(address);
       div.style.border = '2px solid rgb(304, 0, 318)';
       li.appendChild(div);
       //drag and drop//
@@ -60,23 +65,41 @@
       li.style.margin = '10px';
       li.style.padding = '10px';
       li.draggable = true;
-
-      li.addEventListener('dragover', (evt) => dragoverHandler(evt));
       li.addEventListener('dragstart', (evt) => dragstartHandler(evt));
+      address.addEventListener('drop', (event) => dropHandler_li(event, li.id ));
       return li;
+    }
+    setNames = () => {
+      const ulNodes = document.getElementsByTagName('UL');
+      const rootName = 'Tree';
+      for(let i = 0; i < ulNodes.length; ++i){
+        if (i === 0) {
+          ulNodes[i].title = rootName;
+        } else ulNodes[i].title = ulNodes[i-1].title+0;
+        console.log('ulNodes[i].title', ulNodes[i].title);
+        let ul_arr = ulNodes[i].childNodes;
+        let ulTitle = ulNodes[i].title;
+        let j = 0;
+        while(j < ul_arr.length){
+          let li = ul_arr[j];
+          li.title = ulTitle + j;
+          let div = li.firstChild;
+          div.firstChild.innerHTML = li.title;
+          ++j;
+        }
+      }
     }
     createUl = (name) => {
       const id = new Date().valueOf();
       let ul = document.createElement('ul');
-      ul.value = 'dropTarget';
+      ul.value = 'dropTargetUl';
       ul.id = `Ul${id}`;
       ul.title = `${name}`;
       //drag and drop//
       ul.style.border = '2px solid rgb(204, 0, 108)';
       ul.style.padding = '15px';
       ul.style.margin = '15px';
-      //ul.draggable = true;
-      ul.addEventListener('drop', (event) => dropHandler(event, ul.id));
+      ul.addEventListener('drop', (event) => dropHandler_Ul(event, ul.id ));
       ul.addEventListener('dragover', (event) => dragoverHandler(event));
       ul.addEventListener('dragenter', (event) => dragenterHandler(event));
       ul.addEventListener('dragleave', (event) => event.target.style.backgroundColor = 'initial');
@@ -92,8 +115,7 @@
       } else {
         remove_button.disabled = false;
         for(inp of inputArr){
-        let grandParent = inp.parentNode.parentNode;
-          if(grandParent.childElementCount < 2){
+          if(grandParent(inp).childElementCount < 2){
             close_button.disabled = true;
             break;
           } else close_button.disabled = false;
@@ -112,11 +134,11 @@
         parent.parentNode.appendChild(ulBranch);
       } else if(input_arr.length) {
           for(inp of input_arr) {
-            let title = inp.parentNode.parentNode.title;
+            let title = grandParent(inp).title;
             if(!inp.parentNode.nextSibling){
               let ulBranch1 = createUl(title);
               ulBranch1.appendChild(createBranch(title+0))
-              inp.parentNode.parentNode.appendChild(ulBranch1);
+              grandParent(inp).appendChild(ulBranch1);
             } else {
               let subUl = inp.parentNode.nextSibling;
               const liTitle = subUl.lastChild.title;
@@ -151,10 +173,9 @@
     removeHandler = () => {
       const input_arr = document.querySelectorAll('input:checked');
       for(inp of input_arr) {
-        let grandParent = inp.parentNode.parentNode;
-        if(grandParent.parentNode.childElementCount > 1)
-          grandParent.remove();
-        else grandParent.parentNode.remove();
+        if(grandParent(inp).parentNode.childElementCount > 1)
+          grandParent(inp).remove();
+        else grandParent(inp).parentNode.remove();
       }
       const close_button = document.querySelector('button[value = "CLOSE"]');
       close_button.innerHTML = 'CLOSE';
@@ -181,105 +202,119 @@
     const info = document.createElement('div');
     header.appendChild(info);
     info.style.display = 'flex';
-    info.style.flexDirection = 'column';
+    //info.style.flexDirection = 'column';
+    info.style.flexWrap = 'wrap';
     createInfo = (title) => {
       const input = document.createElement('INPUT');
       input.setAttribute('type', 'text');
       const p = document.createElement('p');
       p.innerHTML = title;
       p.style.margin = '5px';
+      input.style.width = '400px';
       p.appendChild(input);
       input.style.margin = '1px';
+      info.appendChild(input.parentNode);
       return input;
     }
     const input1 = createInfo(' coords');
     document.onmousemove = () => {
       input1.setAttribute("value",showCoords(event))
     }
-    info.appendChild(input1.parentNode);
+    input1.style.width = '120px';
     const input2 = createInfo(' dragover');
-    input2.style.width = '350px';
-    info.appendChild(input2.parentNode);
-    const input3 = createInfo(' drop');
-    input3.style.display = 'flex';
-    input3.style.width = '350px';
-    info.appendChild(input3.parentNode);
+    const input3 = createInfo(' drop on Ul');
+    const input3_ = createInfo(' drop on li');
     const input4 = createInfo(' drag start');
-    input4.style.width = '350px';
-    info.appendChild(input4.parentNode);
     const input5 = createInfo(' onMouseDown');
-    input5.style.width = '350px'
-    info.appendChild(input5.parentNode);
-    const elem = document.onmousedown = () => {
+    document.onmousedown = () => {
       input5.setAttribute("value",`${event.target}, ${event.target.id}`);
-      return event.target.id;
     }
     showCoords = (ev) => {
-        var x = ev.clientX;
-        var y = ev.clientY;
-        var coords = "X: " + x + ", Y: " + y;
+        let x = ev.clientX, y = ev.clientY;
+        let coords = "X: " + x + ", Y: " + y;
         return coords;
+    }
+    const dragElement = (ev) => {
+      const moveItemIndex = ev.dataTransfer.getData("text");
+      const moveItem =  document.getElementById(moveItemIndex);
+      return moveItem;
     }
     getNearElIndex = (ev) => {
       const children = ev.target.childNodes;
       const el = children[0];
       let index = children.length-1;
       const last_Y = ev.clientY;
-      const moveItemIndex = ev.dataTransfer.getData("text");
-      const moveItem =  document.getElementById(moveItemIndex);
-      const initial_Y = moveItem.getBoundingClientRect().top;
+      const initial_Y = dragElement(ev).getBoundingClientRect().top;
       for(let i = 0; i < children.length; ++i){
         const target_Y = children[i].getBoundingClientRect().top;
         const dist = target_Y - last_Y;
         const direction = last_Y - initial_Y;
         if(dist > 0) {
           if(direction < 0)//moving up
-          index = i;
+            index = i;
           else index = --i; //moving down
           break;
         }
       }
       return index;
     }
-    dropHandler = (ev, location) => {
+    removable = (drag_el) => {
+      if(!drag_el.nextSibling && !drag_el.previousSibling
+        && (grandParent(drag_el).parentNode.tagName === 'UL')
+        && (parent !== drag_el.parentNode)){
+          return true;
+        } else return false;
+    }
+    dropHandler_Ul = (ev, location) => {
       const parent = ev.target;
-      let data = ev.dataTransfer.getData("text");
-      let el = document.getElementById(data);
-
-      console.log(location, el.parentNode.id, parent.id);
-      // TODO check if listener works only first time
-      // if (location !== el.parentNode.id) return null;
-
+      const drag_el = dragElement(ev);
+      if (location !== parent.id) return;
       const ul_arr = [];
       let children = parent.childNodes;
       const index = getNearElIndex(ev);
-      let n = children.length;
-      for (let i = 0; i < n; ++i){
-        if(children[i] !== el)
+      for (let i = 0; i < children.length; ++i){
+        if(children[i] !== drag_el)
         ul_arr.push(children[i]);
       }
-      if(!el.nextSibling && !el.previousSibling
-        && (el.parentNode.parentNode.parentNode.tagName === 'UL')
-        && (parent !== el.parentNode))
-        el.parentNode.remove();
-      ul_arr.splice(index,0,el);
-      while(parent.firstChild) parent.firstChild.remove();
-      i = 0;
+      if(removable(drag_el)) drag_el.parentNode.remove();
+      ul_arr.splice(index,0,drag_el);
+      while(parent.firstChild) {
+        parent.firstChild.remove();
+      }
+      let i = 0;
       while(ul_arr[i]) {
-        console.log(ul_arr[i].firstChild.firstChild.innerHTML);
-        // cosnt original = ul_arr[i].firstChild.firstChild.innerHTML
-        ul_arr[i].firstChild.firstChild.innerHTML += ` -> ${i}`;
         parent.appendChild(ul_arr[i++]);
       }
+      setNames();
       parent.style.backgroundColor = 'initial';
-      input3.setAttribute("value",`${showCoords(ev)}, target=${ev.target.id}, data=${data}`);
+      input3.setAttribute("value",`${showCoords(ev)}, target=${ev.target.id}, data=${drag_el.id}`);
+      ev.preventDefault();
+    };
+
+    dropHandler_li = (ev, value) => {
+      const drag_el = dragElement(ev);
+      const parent_li = grandParent(ev.target);
+      if (parent_li.firstChild.nextSibling || drag_el.contains(ev.target)){
+        ev.target.style.backgroundColor = 'initial';
+        return;
+      } 
+      let address = drag_el.firstChild.firstChild;
+      let title = parent_li.title;
+      let ulBranch = createUl(title);
+      address.innerHTML = ulBranch.title+0;
+      if(removable(drag_el)) drag_el.parentNode.remove();
+      ulBranch.appendChild(drag_el);
+      drag_el.title = ulBranch.title+0;
+      parent_li.appendChild(ulBranch);
+      ev.target.style.backgroundColor = 'initial';
+      setNames();
       ev.preventDefault();
     };
     dragoverHandler = (ev) => {
       let d = '';
-      if(ev.target.value === 'dropTarget') {
-        ev.preventDefault();
+      if(ev.target.value === 'dropTargetUl' || ev.target.value === 3) {
         d = ev.target.value;
+        ev.preventDefault();
       } else d = 'no drop';
       input2.setAttribute("value",`${showCoords(ev)}, ${ev.target.id}, value:${d}`);
     };
@@ -288,9 +323,12 @@
       input4.setAttribute("value",`${showCoords(ev)}, ${ev.target.id}`);
     };
     dragenterHandler = (ev) => {
-      if (ev.target.value === 'dropTarget')
-      ev.target.style.backgroundColor = 'hsla(328, 92%, 88%, 0.72)';
+      if (ev.target.value === 'dropTargetUl')
+        ev.target.style.backgroundColor = 'hsla(328, 92%, 88%, 0.72)';
+      if (ev.target.value === 3)
+        ev.target.style.backgroundColor = 'hsla(157, 68%, 59%, 0.58)';
     }
+
     </script>
   </body>
 </html>
