@@ -64,12 +64,8 @@
       li.appendChild(div);
       //drag and drop//
       li.draggable = true;
-      li.addEventListener('dragstart', (ev) => {
-        console.log('start',ev.target.parentNode.id);
-        ev.dataTransfer.setData("parent_id", ev.target.parentNode.id);
-        ev.dataTransfer.setData("text", ev.target.id);
-      });
-      address.addEventListener('drop', (ev) => dropHandler_li(ev, li.id ));
+      li.addEventListener('dragstart', (ev) => dragStartHandler(ev));
+      address.addEventListener('drop', (ev) => dropHandler_li(ev));
       return li;
     }
     createUl = (name) => {
@@ -80,6 +76,7 @@
       ul.title = `${name}`;
       ul.style.paddingTop = '6px';
       ul.style.paddingBottom = '6px';
+      ul.style.border = '0.01px solid blue';
       //drag and drop//
       ul.addEventListener('drop', (ev) => dropHandler_Ul(ev));
       ul.addEventListener('dragover', (ev) => ev.preventDefault());
@@ -257,63 +254,53 @@
       const moveItem =  document.getElementById(moveItemIndex);
       return moveItem;
     }
-    removable = (drag_el,ev) => {
-      let parent_id = ev.dataTransfer.getData("parent_id");
-      let prev_parent = document.getElementById(parent_id);
-      if(prev_parent.childElementCount === 0){
-          return true;
-        } else return false;
+    dragStartHandler = (ev) => {
+      ev.stopImmediatePropagation();
+      ev.dataTransfer.setData("text", ev.target.id);
     }
     dropHandler_Ul = (ev) => {
-      const target = ev.target;
+      ev.stopImmediatePropagation();
       const drag_el = dragElement(ev);
-       if (target.title == 'Tree' || drag_el.contains(ev.target)){
-         target.style.backgroundColor = 'initial';
+       if (ev.target.title == 'Tree'
+          || drag_el.contains(ev.target)){
+         ev.target.style.backgroundColor = 'initial';
          return;
        }
       const ul_arr = [];
-      let children = target.childNodes;
+      let children = ev.target.childNodes;
       const index = getNearElIndex(ev);
       for (let i = 0; i < children.length; ++i){
         if(children[i] !== drag_el)
         ul_arr.push(children[i]);
       }
-      let parent_id = ev.dataTransfer.getData("parent_id");
-      let prev_parent = document.getElementById(parent_id);
-      console.log(removable(drag_el, ev), 'dropHandler_Ul')
-      if(removable(drag_el,ev)) prev_parent.remove();
+      if (drag_el.parentNode.childElementCount === 1)
+        drag_el.parentNode.remove();
       ul_arr.splice(index,0,drag_el);
-      while(target.firstChild) target.firstChild.remove();
+      while(ev.target.firstChild) ev.target.firstChild.remove();
       let i = 0;
-      while(ul_arr[i]) target.appendChild(ul_arr[i++]);
+      while(ul_arr[i]) ev.target.appendChild(ul_arr[i++]);
       setNames();
-      target.style.backgroundColor = 'initial';
+      ev.target.style.backgroundColor = 'initial';
       ev.preventDefault();
-      ev.stopImmediatePropagation();
     };
-
     dropHandler_li = (ev) => {
+      ev.stopImmediatePropagation();
       const drag_el = dragElement(ev);
       const parent_li = grandParent(ev.target);
-      if (parent_li.childElementCount > 1 || drag_el.contains(ev.target)){
+      if (parent_li.contains(drag_el)
+        ||  drag_el.contains(ev.target)){
         ev.target.style.backgroundColor = 'initial';
         return;
       }
-      let address = drag_el.firstChild.firstChild;
+      if (drag_el.parentNode.childElementCount === 1)
+        drag_el.parentNode.remove();
       let title = parent_li.title;
       let ulBranch = createUl(title);
-      address.innerHTML = ulBranch.title+0;
       ulBranch.appendChild(drag_el);
-      drag_el.title = ulBranch.title+0;
       parent_li.appendChild(ulBranch);
       ev.target.style.backgroundColor = 'initial';
-      let parent_id = ev.dataTransfer.getData("parent_id");
-      let prev_parent = document.getElementById(parent_id);
-      console.log(removable(drag_el, ev), 'dropHandler_li')
-      if(removable(drag_el,ev)) prev_parent.remove();
       setNames();
       ev.preventDefault();
-      ev.stopImmediatePropagation();
     };
     dragenterHandler = (ev) => {
       if (ev.target.value === 'dropTargetUl')
