@@ -35,7 +35,10 @@
       const input = document.createElement('INPUT');
       input.id = `inp${inputId}`;
       input.setAttribute('type', 'checkbox');
-      input.addEventListener('change', () => checkButtonsState());
+      input.style.cssFloat = 'left';
+      input.style.width = '17px'
+      input.style.height = '17px'
+      input.addEventListener('change', (evn) => inputChangeHandler(evn));
       return input;
     }
     createBranch = (name) => {
@@ -43,51 +46,31 @@
       const li = document.createElement('li');
       li.id = `li${id}`;
       li.title = name;
-      li.value = 0;
       const div = document.createElement('div');
       div.id = `div${id}`;
-      div.value = 1;
-      const li_name = document.createElement('h2');
+      const li_name = document.createElement('h4');
       li_name.innerHTML = name;
+      li_name.style.margin = 0;
       div.appendChild(li_name);
+      li.style.margin = '10px';
       const input = createInput(id);
-      input.style.cssFloat = 'left';
       div.appendChild(input);
-      const address = document.createElement('h2');
+      const address = document.createElement('h4');
       address.innerHTML = (`|___ id = ${li.id}`);
-      address.value = 3;
+      address.value = 1;
+      address.style.margin = 0;
       address.style.color = `rgb(${parseInt(Math.random()*300)}, 0, ${parseInt(Math.random()*200)})`;
       div.appendChild(address);
-      div.style.border = '2px solid rgb(304, 0, 318)';
       li.appendChild(div);
       //drag and drop//
-      li.style.border = '2px solid rgb(104, 0, 18)';
-      li.style.margin = '10px';
-      li.style.padding = '10px';
       li.draggable = true;
-      li.addEventListener('dragstart', (evt) => dragstartHandler(evt));
-      address.addEventListener('drop', (event) => dropHandler_li(event, li.id ));
+      li.addEventListener('dragstart', (ev) => {
+        console.log('start',ev.target.parentNode.id);
+        ev.dataTransfer.setData("parent_id", ev.target.parentNode.id);
+        ev.dataTransfer.setData("text", ev.target.id);
+      });
+      address.addEventListener('drop', (ev) => dropHandler_li(ev, li.id ));
       return li;
-    }
-    setNames = () => {
-      const ulNodes = document.getElementsByTagName('UL');
-      const rootName = 'Tree';
-      for(let i = 0; i < ulNodes.length; ++i){
-        if (i === 0) {
-          ulNodes[i].title = rootName;
-        } else ulNodes[i].title = ulNodes[i-1].title+0;
-        console.log('ulNodes[i].title', ulNodes[i].title);
-        let ul_arr = ulNodes[i].childNodes;
-        let ulTitle = ulNodes[i].title;
-        let j = 0;
-        while(j < ul_arr.length){
-          let li = ul_arr[j];
-          li.title = ulTitle + j;
-          let div = li.firstChild;
-          div.firstChild.innerHTML = li.title;
-          ++j;
-        }
-      }
     }
     createUl = (name) => {
       const id = new Date().valueOf();
@@ -95,32 +78,64 @@
       ul.value = 'dropTargetUl';
       ul.id = `Ul${id}`;
       ul.title = `${name}`;
+      ul.style.paddingTop = '6px';
+      ul.style.paddingBottom = '6px';
       //drag and drop//
-      ul.style.border = '2px solid rgb(204, 0, 108)';
-      ul.style.padding = '15px';
-      ul.style.margin = '15px';
-      ul.addEventListener('drop', (event) => dropHandler_Ul(event, ul.id ));
-      ul.addEventListener('dragover', (event) => dragoverHandler(event));
-      ul.addEventListener('dragenter', (event) => dragenterHandler(event));
-      ul.addEventListener('dragleave', (event) => event.target.style.backgroundColor = 'initial');
+      ul.addEventListener('drop', (ev) => dropHandler_Ul(ev));
+      ul.addEventListener('dragover', (ev) => ev.preventDefault());
+      ul.addEventListener('dragenter', (ev) => dragenterHandler(ev));
+      ul.addEventListener('dragleave', (ev) => ev.target.style.backgroundColor = 'initial');
       return ul;
     }
-    checkButtonsState = () => {
+    inputChangeHandler = (ev) => {
       const inputArr = document.querySelectorAll('input:checked');
+      for(inp of inputArr){
+        if(inp !== ev.target) inp.checked = false;
+      }
       const close_button = document.querySelector('button[value = "CLOSE"]');
       const remove_button = document.querySelector('button[value = "REMOVE"]');
-      if(!inputArr.length) {
+      const create_button = document.querySelector('button[value = "CREATE"]');
+      if(inputArr.length === 0) {
         close_button.disabled = true;
         remove_button.disabled = true;
-      } else {
+        create_button.disabled = true;
+      } else if(grandParent(ev.target).childElementCount < 2){
+        close_button.disabled = true;
         remove_button.disabled = false;
-        for(inp of inputArr){
-          if(grandParent(inp).childElementCount < 2){
-            close_button.disabled = true;
-            break;
-          } else close_button.disabled = false;
-        }
+        create_button.disabled = false
+      } else {
+        close_button.disabled = false;
+        remove_button.disabled = false;
+        create_button.disabled = false;
       }
+    }
+
+    checkButtonsState = () => {
+      const create_button = document.querySelector('button[value = "CREATE"]');
+      const close_button = document.querySelector('button[value = "CLOSE"]');
+      const remove_button = document.querySelector('button[value = "REMOVE"]');
+      if (document.querySelectorAll('input:checked').length === 0
+       && document.querySelectorAll('ul').length === 0){
+         create_button.disabled = true;
+         close_button.disabled = true;
+         remove_button.disabled = true;
+       }
+       if (document.querySelectorAll('ul').length === 0){
+         create_button.disabled = false;
+         close_button.disabled = true;
+         remove_button.disabled = true;
+       }
+        if(document.querySelectorAll('input:checked').length === 1){
+         create_button.disabled = false;
+         close_button.disabled = false;
+         remove_button.disabled = false
+       }
+        if (document.querySelectorAll('ul').length === 1
+        && document.querySelectorAll('input:checked').length === 0){
+         create_button.disabled = true;
+         close_button.disabled = true;
+         remove_button.disabled = true;
+        }
     }
     addHandler = () => {
       const rootName = 'Tree';
@@ -199,46 +214,7 @@
     container.appendChild(header);
     /////////////////////////////////////////////////
     //drag and drop//
-    const info = document.createElement('div');
-    header.appendChild(info);
-    info.style.display = 'flex';
-    //info.style.flexDirection = 'column';
-    info.style.flexWrap = 'wrap';
-    createInfo = (title) => {
-      const input = document.createElement('INPUT');
-      input.setAttribute('type', 'text');
-      const p = document.createElement('p');
-      p.innerHTML = title;
-      p.style.margin = '5px';
-      input.style.width = '400px';
-      p.appendChild(input);
-      input.style.margin = '1px';
-      info.appendChild(input.parentNode);
-      return input;
-    }
-    const input1 = createInfo(' coords');
-    document.onmousemove = () => {
-      input1.setAttribute("value",showCoords(event))
-    }
-    input1.style.width = '120px';
-    const input2 = createInfo(' dragover');
-    const input3 = createInfo(' drop on Ul');
-    const input3_ = createInfo(' drop on li');
-    const input4 = createInfo(' drag start');
-    const input5 = createInfo(' onMouseDown');
-    document.onmousedown = () => {
-      input5.setAttribute("value",`${event.target}, ${event.target.id}`);
-    }
-    showCoords = (ev) => {
-        let x = ev.clientX, y = ev.clientY;
-        let coords = "X: " + x + ", Y: " + y;
-        return coords;
-    }
-    const dragElement = (ev) => {
-      const moveItemIndex = ev.dataTransfer.getData("text");
-      const moveItem =  document.getElementById(moveItemIndex);
-      return moveItem;
-    }
+
     getNearElIndex = (ev) => {
       const children = ev.target.childNodes;
       const el = children[0];
@@ -258,74 +234,91 @@
       }
       return index;
     }
-    removable = (drag_el) => {
-      if(!drag_el.nextSibling && !drag_el.previousSibling
-        && (grandParent(drag_el).parentNode.tagName === 'UL')
-        && (parent !== drag_el.parentNode)){
+    setNames = () => {
+      const ulNodes = document.getElementsByTagName('ul');
+      const rootName = 'Tree';
+      ulNodes[0].title = rootName;
+      for(let i = 1; i < ulNodes.length; ++i){
+        ulNodes[i].title = ulNodes[i].parentNode.title;
+        let li_arr = ulNodes[i].childNodes;
+        let ulTitle = ulNodes[i].title;
+        li_arr[0].title = ulTitle+0;
+        li_arr[0].firstChild.firstChild.innerHTML = li_arr[0].title;
+        for(let j = 1; j < li_arr.length; ++j){
+          let li = li_arr[j];
+          li.title = ulTitle + j;
+          let div = li.firstChild;
+          div.firstChild.innerHTML = li.title;
+        }
+      }
+    }
+    const dragElement = (ev) => {
+      const moveItemIndex = ev.dataTransfer.getData("text");
+      const moveItem =  document.getElementById(moveItemIndex);
+      return moveItem;
+    }
+    removable = (drag_el,ev) => {
+      let parent_id = ev.dataTransfer.getData("parent_id");
+      let prev_parent = document.getElementById(parent_id);
+      if(prev_parent.childElementCount === 0){
           return true;
         } else return false;
     }
-    dropHandler_Ul = (ev, location) => {
-      const parent = ev.target;
+    dropHandler_Ul = (ev) => {
+      const target = ev.target;
       const drag_el = dragElement(ev);
-      if (location !== parent.id) return;
+       if (target.title == 'Tree' || drag_el.contains(ev.target)){
+         target.style.backgroundColor = 'initial';
+         return;
+       }
       const ul_arr = [];
-      let children = parent.childNodes;
+      let children = target.childNodes;
       const index = getNearElIndex(ev);
       for (let i = 0; i < children.length; ++i){
         if(children[i] !== drag_el)
         ul_arr.push(children[i]);
       }
-      if(removable(drag_el)) drag_el.parentNode.remove();
+      let parent_id = ev.dataTransfer.getData("parent_id");
+      let prev_parent = document.getElementById(parent_id);
+      console.log(removable(drag_el, ev), 'dropHandler_Ul')
+      if(removable(drag_el,ev)) prev_parent.remove();
       ul_arr.splice(index,0,drag_el);
-      while(parent.firstChild) {
-        parent.firstChild.remove();
-      }
+      while(target.firstChild) target.firstChild.remove();
       let i = 0;
-      while(ul_arr[i]) {
-        parent.appendChild(ul_arr[i++]);
-      }
+      while(ul_arr[i]) target.appendChild(ul_arr[i++]);
       setNames();
-      parent.style.backgroundColor = 'initial';
-      input3.setAttribute("value",`${showCoords(ev)}, target=${ev.target.id}, data=${drag_el.id}`);
+      target.style.backgroundColor = 'initial';
       ev.preventDefault();
+      ev.stopImmediatePropagation();
     };
 
-    dropHandler_li = (ev, value) => {
+    dropHandler_li = (ev) => {
       const drag_el = dragElement(ev);
       const parent_li = grandParent(ev.target);
-      if (parent_li.firstChild.nextSibling || drag_el.contains(ev.target)){
+      if (parent_li.childElementCount > 1 || drag_el.contains(ev.target)){
         ev.target.style.backgroundColor = 'initial';
         return;
-      } 
+      }
       let address = drag_el.firstChild.firstChild;
       let title = parent_li.title;
       let ulBranch = createUl(title);
       address.innerHTML = ulBranch.title+0;
-      if(removable(drag_el)) drag_el.parentNode.remove();
       ulBranch.appendChild(drag_el);
       drag_el.title = ulBranch.title+0;
       parent_li.appendChild(ulBranch);
       ev.target.style.backgroundColor = 'initial';
+      let parent_id = ev.dataTransfer.getData("parent_id");
+      let prev_parent = document.getElementById(parent_id);
+      console.log(removable(drag_el, ev), 'dropHandler_li')
+      if(removable(drag_el,ev)) prev_parent.remove();
       setNames();
       ev.preventDefault();
-    };
-    dragoverHandler = (ev) => {
-      let d = '';
-      if(ev.target.value === 'dropTargetUl' || ev.target.value === 3) {
-        d = ev.target.value;
-        ev.preventDefault();
-      } else d = 'no drop';
-      input2.setAttribute("value",`${showCoords(ev)}, ${ev.target.id}, value:${d}`);
-    };
-    dragstartHandler = (ev) => {
-      ev.dataTransfer.setData("text", ev.target.id);
-      input4.setAttribute("value",`${showCoords(ev)}, ${ev.target.id}`);
+      ev.stopImmediatePropagation();
     };
     dragenterHandler = (ev) => {
       if (ev.target.value === 'dropTargetUl')
         ev.target.style.backgroundColor = 'hsla(328, 92%, 88%, 0.72)';
-      if (ev.target.value === 3)
+      if (ev.target.value === 1)
         ev.target.style.backgroundColor = 'hsla(157, 68%, 59%, 0.58)';
     }
 
