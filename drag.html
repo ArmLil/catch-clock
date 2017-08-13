@@ -81,7 +81,7 @@
       ul.addEventListener('drop', (ev) => dropHandler_Ul(ev));
       ul.addEventListener('dragover', (ev) => ev.preventDefault());
       ul.addEventListener('dragenter', (ev) => dragenterHandler(ev));
-      ul.addEventListener('dragleave', (ev) => ev.target.style.backgroundColor = 'initial');
+      ul.addEventListener('dragleave', (ev) => ev.target.style.border = 'initial');
       return ul;
     }
     inputChangeHandler = (ev) => {
@@ -265,7 +265,7 @@
           || drag_el.contains(ev.target)
           || ev.target.nodeName !== 'UL'
           || (ev.target.firstChild == drag_el)){
-         ev.target.style.backgroundColor = 'initial';
+         ev.target.style.border = 'initial';
          return;
        }
       const ul_arr = [];
@@ -282,7 +282,7 @@
       let i = 0;
       while(ul_arr[i]) ev.target.appendChild(ul_arr[i++]);
       setNames();
-      ev.target.style.backgroundColor = 'initial';
+      ev.target.style.border = 'initial';
       ev.preventDefault();
     };
     dropHandler_li = (ev) => {
@@ -292,7 +292,7 @@
       if (parent_li.contains(drag_el)
         ||  drag_el.contains(ev.target)
         || ev.target.parentNode.nextSibling){
-        ev.target.style.backgroundColor = 'initial';
+        ev.target.style.border = 'initial';
         return;
       }
       if (drag_el.parentNode.childElementCount === 1)
@@ -301,15 +301,16 @@
       let ulBranch = createUl(title);
       ulBranch.appendChild(drag_el);
       parent_li.appendChild(ulBranch);
-      ev.target.style.backgroundColor = 'initial';
+      ev.target.style.border = 'initial';
       setNames();
       ev.preventDefault();
     };
     dragenterHandler = (ev) => {
       if (ev.target.value === 'dropTargetUl')
-        ev.target.style.backgroundColor = 'hsla(328, 92%, 88%, 0.72)';
+        //ev.target.style.backgroundColor = 'hsla(328, 92%, 88%, 0.72)';
+        ev.target.style.border = '3px dotted hsla(328, 92%, 88%, 0.72)';
       if (ev.target.value === 1)
-        ev.target.style.backgroundColor = 'hsla(157, 68%, 59%, 0.58)';
+        ev.target.style.border = '3px dotted hsla(157, 68%, 59%, 0.58)';
     }
 
     </script>
