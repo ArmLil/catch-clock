@@ -7,6 +7,10 @@
    <body>
     <div id='root'></div>
     <script type='text/javascript'>
+    document.addEventListener('mouseover', (ev) => {
+      if (ev.target.value === 1)
+            ev.target.style.cursor = 'move';
+          })
     createButton = (buttonName, handler) => {
       const button = document.createElement('button');
       button.innerHTML = buttonName;
