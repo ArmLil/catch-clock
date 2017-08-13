@@ -76,7 +76,7 @@
       ul.title = `${name}`;
       ul.style.paddingTop = '6px';
       ul.style.paddingBottom = '6px';
-      ul.style.border = '0.01px solid blue';
+      //ul.style.border = '0.01px solid blue';
       //drag and drop//
       ul.addEventListener('drop', (ev) => dropHandler_Ul(ev));
       ul.addEventListener('dragover', (ev) => ev.preventDefault());
@@ -261,8 +261,10 @@
     dropHandler_Ul = (ev) => {
       ev.stopImmediatePropagation();
       const drag_el = dragElement(ev);
-       if (ev.target.title == 'Tree'
-          || drag_el.contains(ev.target)){
+       if (ev.target.title === 'Tree'
+          || drag_el.contains(ev.target)
+          || ev.target.nodeName !== 'UL'
+          || (ev.target.firstChild == drag_el)){
          ev.target.style.backgroundColor = 'initial';
          return;
        }
@@ -288,7 +290,8 @@
       const drag_el = dragElement(ev);
       const parent_li = grandParent(ev.target);
       if (parent_li.contains(drag_el)
-        ||  drag_el.contains(ev.target)){
+        ||  drag_el.contains(ev.target)
+        || ev.target.parentNode.nextSibling){
         ev.target.style.backgroundColor = 'initial';
         return;
       }
