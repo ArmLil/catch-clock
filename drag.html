@@ -116,7 +116,7 @@
       const close_button = document.querySelector('button[value = "CLOSE"]');
       const remove_button = document.querySelector('button[value = "REMOVE"]');
       if (document.querySelectorAll('input:checked').length === 0
-       && document.querySelectorAll('ul').length === 0){
+       && document.querySelectorAll('ul').length !== 0){
          create_button.disabled = true;
          close_button.disabled = true;
          remove_button.disabled = true;
@@ -165,6 +165,9 @@
         const nextTitle = ul.lastChild.title;
         ul.appendChild(createBranch(getName(nextTitle)));
       }
+      const close_button = document.querySelector('button[value = "CLOSE"]');
+      close_button.innerHTML = 'CLOSE';
+      close_button.disabled = false;
       checkButtonsState();
     }
     closeHandler = () => {
